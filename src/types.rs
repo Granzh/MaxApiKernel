@@ -1,3 +1,8 @@
+// Copyright (c) 2026 FlintWithBlackCrown
+// This file includes code derived from PyMax,
+// Copyright (c) 2025 ink-developer, licensed under the MIT License.
+// See the LICENSE file for details.
+
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;

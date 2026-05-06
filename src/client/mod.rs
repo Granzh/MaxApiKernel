@@ -1,3 +1,8 @@
+// Copyright (c) 2026 FlintWithBlackCrown
+// This file includes code derived from PyMax,
+// Copyright (c) 2025 ink-developer, licensed under the MIT License.
+// See the LICENSE file for details.
+
 pub mod auth;
 pub mod group;
 pub mod handler;
@@ -512,8 +517,9 @@ impl MaxClient {
         let tx = guard.as_ref().ok_or_else(|| {
             MaxError::Other("Client is not running; call start() first".to_string())
         })?;
-        tx.send(())
-            .map_err(|_| MaxError::Other("Client is not running; call start() first".to_string()))?;
+        tx.send(()).map_err(|_| {
+            MaxError::Other("Client is not running; call start() first".to_string())
+        })?;
 
         Ok(())
     }

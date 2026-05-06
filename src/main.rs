@@ -1,3 +1,8 @@
+// Copyright (c) 2026 FlintWithBlackCrown
+// This file includes code derived from PyMax,
+// Copyright (c) 2025 ink-developer, licensed under the MIT License.
+// See the LICENSE file for details.
+
 use max_api_kernel::MaxClient;
 use std::sync::Arc;
 use tracing_subscriber::EnvFilter;
