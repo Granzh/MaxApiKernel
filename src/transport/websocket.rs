@@ -131,13 +131,19 @@ impl WebSocketTransport {
             let mut sink_guard = self.sink.lock().await;
             match sink_guard.as_mut() {
                 Some(sink) => {
-                    sink.send(WsMessage::Text(json_str))
-                        .await
-                        .map_err(MaxError::WebSocket)?;
+                    if let Err(e) = sink.send(WsMessage::Text(json_str)).await {
+                        *sink_guard = None;
+                        drop(sink_guard);
+                        state
+                            .is_connected
+                            .store(false, std::sync::atomic::Ordering::SeqCst);
+                        state.pending.lock().await.remove(&seq);
+                        return Err(MaxError::WebSocket(e));
+                    }
                 }
                 None => {
-                    let mut pending = state.pending.lock().await;
-                    pending.remove(&seq);
+                    drop(sink_guard);
+                    state.pending.lock().await.remove(&seq);
                     return Err(MaxError::WebSocketNotConnected);
                 }
             }
@@ -201,17 +207,6 @@ async fn recv_loop(
                     "WebSocket closed: {:?}",
                     frame.map(|f| f.reason.to_string())
                 );
-                state
-                    .is_connected
-                    .store(false, std::sync::atomic::Ordering::SeqCst);
-
-                {
-                    let mut pending = state.pending.lock().await;
-                    pending.clear();
-                }
-
-                let mut sink_guard = sink.lock().await;
-                *sink_guard = None;
                 break;
             }
             Ok(WsMessage::Ping(data)) => {
@@ -228,6 +223,14 @@ async fn recv_loop(
         }
     }
 
+    {
+        let mut pending = state.pending.lock().await;
+        pending.clear();
+    }
+    {
+        let mut sink_guard = sink.lock().await;
+        *sink_guard = None;
+    }
     state
         .is_connected
         .store(false, std::sync::atomic::Ordering::SeqCst);
