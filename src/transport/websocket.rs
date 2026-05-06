@@ -143,8 +143,9 @@ impl WebSocketTransport {
         tokio::time::timeout(timeout, rx)
             .await
             .map_err(|_| {
-                let mut p = state.pending.blocking_lock();
-                p.remove(&seq);
+                if let Ok(mut p) = state.pending.try_lock() {
+                    p.remove(&seq);
+                }
                 MaxError::Timeout
             })?
             .map_err(|_| MaxError::WebSocketNotConnected)
