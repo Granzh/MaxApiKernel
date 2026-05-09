@@ -11,6 +11,7 @@ use tokio::net::TcpStream;
 use tokio::sync::{oneshot, Mutex};
 use tokio_native_tls::TlsStream;
 use tracing::{debug, error, info, warn};
+use tokio_native_tls::native_tls;
 
 use crate::constants::RECV_LOOP_BACKOFF_SECS;
 use crate::enums::Opcode;

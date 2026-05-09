@@ -15,6 +15,9 @@ pub mod payloads;
 pub mod transport;
 pub mod types;
 
+#[cfg(target_os = "android")]
+pub mod android_jni;
+
 pub use client::message::AttachmentKind;
 pub use client::MaxClient;
 pub use enums::{

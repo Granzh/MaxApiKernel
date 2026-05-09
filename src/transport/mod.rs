@@ -180,7 +180,6 @@ async fn dispatch_message_notification(state: &Arc<ClientState>, opcode: Opcode,
                 .collect();
             fns
         }
-        _ => vec![],
     };
 
     for (handler, filter) in handlers_to_use {

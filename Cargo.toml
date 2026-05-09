@@ -6,6 +6,7 @@ edition = "2021"
 [lib]
 name = "max_api_kernel"
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
 
 [[bin]]
 name = "MaxApiKernel"
@@ -13,13 +14,11 @@ path = "src/main.rs"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
-tokio-tungstenite = { version = "0.24", features = ["native-tls"] }
 futures-util = "0.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rmp-serde = "1.3"
 uuid = { version = "1", features = ["v4", "serde"] }
-reqwest = { version = "0.12", features = ["json", "multipart"] }
 rusqlite = { version = "0.31", features = ["bundled"] }
 regex = "1"
 tracing = "0.1"
@@ -30,6 +29,19 @@ lz4_flex = "0.11"
 async-trait = "0.1"
 rand = "0.8"
 qrcode = "0.14"
+bytes = "1"
+rustls = "0.23.40"
+tokio-native-tls = "0.3"
+openssl = { version = "0.10", features = ["vendored"] }
+
+# TLS: rustls for Android compatibility, native-tls for desktop
+[target.'cfg(target_os = "android")'.dependencies]
+tokio-tungstenite = { version = "0.24", default-features = false, features = ["rustls-tls-webpki-roots", "connect"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "multipart", "rustls-tls"] }
+jni = { version = "0.21", features = ["invocation"] }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+tokio-tungstenite = { version = "0.24", features = ["native-tls"] }
+reqwest = { version = "0.12", features = ["json", "multipart"] }
 native-tls = "0.2"
 tokio-native-tls = "0.3"
-bytes = "1"

@@ -175,6 +175,10 @@ impl MaxClient {
         self.state.is_connected.load(Ordering::SeqCst)
     }
 
+    pub fn db_has_token(&self) -> bool {
+        self.db.get_auth_token().ok().flatten().is_some()
+    }
+
     pub async fn send_and_wait(
         &self,
         opcode: Opcode,
@@ -286,7 +290,7 @@ impl MaxClient {
 
         {
             let token_guard = self.token.read().await;
-            if let Some(token) = token_guard.as_ref() {
+            if let Some(_token) = token_guard.as_ref() {
                 if self.db.get_auth_token().ok().flatten().is_none() {
                     drop(token_guard);
                     let token_clone = { self.token.read().await.clone() };
@@ -328,7 +332,7 @@ impl MaxClient {
         Ok(())
     }
 
-    async fn connect_transport(&self) -> MaxResult<()> {
+    pub async fn connect_transport(&self) -> MaxResult<()> {
         match &self.transport {
             TransportKind::WebSocket(ws) => ws.connect(Arc::clone(&self.state)).await?,
             TransportKind::Socket(sock) => sock.connect(Arc::clone(&self.state)).await?,
