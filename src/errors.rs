@@ -5,6 +5,8 @@
 
 use thiserror::Error;
 
+use tokio_native_tls::native_tls;
+
 #[derive(Debug, Error)]
 pub enum MaxError {
     #[error("Invalid phone number format: {0}")]
