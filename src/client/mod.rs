@@ -286,7 +286,7 @@ impl MaxClient {
 
         {
             let token_guard = self.token.read().await;
-            if let Some(token) = token_guard.as_ref() {
+            if let Some(_token) = token_guard.as_ref() {
                 if self.db.get_auth_token().ok().flatten().is_none() {
                     drop(token_guard);
                     let token_clone = { self.token.read().await.clone() };
